@@ -1,3 +1,12 @@
+use simplelog::*;
+
+mod slack;
+
 fn main() {
-    println!("Hello, world!");
+    CombinedLogger::init(
+        vec![
+            TermLogger::new(LevelFilter::Info, Config::default(), TerminalMode::Mixed, ColorChoice::Auto),
+        ]
+    ).unwrap();
+    slack::post_message();
 }
