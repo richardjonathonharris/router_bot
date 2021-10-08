@@ -4,12 +4,12 @@ use std::env;
 
 const ENDPOINT: &str  = "https://slack.com/api/chat.postMessage";
 
-pub struct Config<'a> {
-    channel: &'a str,
+pub struct Config {
+    channel: String,
 }
 
-impl<'a> Config<'a> {
-    pub fn new(channel: &'a str) -> Config<'a> {
+impl Config {
+    pub fn new(channel: String) -> Config {
         Config {
             channel: channel,
         }
@@ -17,13 +17,13 @@ impl<'a> Config<'a> {
 }
 
 #[derive(Serialize)]
-pub struct Payload<'a> {
-    channel: &'a str,
-    text: &'a str,
+pub struct Payload {
+    channel: String,
+    text: String,
 }
 
-impl<'a> Payload<'a> {
-    pub fn new(config: &'a Config, text: &'a str) -> Payload<'a> {
+impl Payload {
+    pub fn new(config: Config, text: String) -> Payload {
         Payload {
             channel: config.channel,
             text: text,
@@ -69,22 +69,22 @@ mod tests {
 
     #[test]
     fn can_create_slack_config() {
-        let config = Config::new(CHANNEL);
+        let config = Config::new(String::from(CHANNEL));
         assert_eq!(config.channel, CHANNEL);
     }
 
     #[test]
     fn can_create_slack_payload() {
-        let config = Config::new(CHANNEL);
-        let payload = Payload::new(&config, MESSAGE);
+        let config = Config::new(String::from(CHANNEL));
+        let payload = Payload::new(config, String::from(MESSAGE));
         assert_eq!(payload.channel, CHANNEL);
         assert_eq!(payload.text, MESSAGE);
     }
 
     #[test]
     fn can_serialize_slack_payload_to_json() {
-        let config = Config::new(CHANNEL);
-        let payload = Payload::new(&config, MESSAGE);
+        let config = Config::new(String::from(CHANNEL));
+        let payload = Payload::new(config, String::from(MESSAGE));
         assert_eq!(String::from("{\"channel\":\"test-channel\",\"text\":\"test-message\"}"), payload.to_json())
     }
 }
