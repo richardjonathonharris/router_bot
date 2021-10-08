@@ -36,16 +36,14 @@ impl<'a> Payload<'a> {
         return serde_json::to_string(&self).unwrap();
     }
 
-    #[tokio::main]
     pub async fn post(&self) -> Result<(), reqwest::Error> {
         let key = "SLACK_BOT_TOKEN";
 
-        let bearer_token = match env::var(key) {
-            Ok(val) => String::from("Bearer ") + &val,
-            Err(e) => panic!("Could not find envvar for {}. Error: {}", key, e),
-        };
+        let mut bearer_token: String = "Bearer ".to_owned();
+        let token = env::var(key).expect("Could not find envvar for SLACK_BOT_TOKEN");
+        bearer_token.push_str(&token);
         let request = String::from(&self.to_json());
-        let client = reqwest::Client::new();
+        let client = reqwest::ClientBuilder::new().build()?;
 
         info!(target: "slack", "Sending body to {}: {}", ENDPOINT, request);
 
