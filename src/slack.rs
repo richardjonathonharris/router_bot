@@ -11,7 +11,7 @@ pub struct Config {
 impl Config {
     pub fn new(channel: String) -> Config {
         Config {
-            channel: channel,
+            channel,
         }
     }
 }
@@ -26,12 +26,12 @@ impl Payload {
     pub fn new(config: Config, text: String) -> Payload {
         Payload {
             channel: config.channel,
-            text: text,
+            text,
         }
     }
 
     pub fn to_json(&self) -> String {
-        return serde_json::to_string(&self).unwrap();
+        serde_json::to_string(&self).unwrap()
     }
 
     pub async fn post(&self) -> Result<(), reqwest::Error> {
