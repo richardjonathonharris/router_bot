@@ -1,24 +1,24 @@
 use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct GithubUser {
-    pub login: String,
+struct GithubUser {
+    login: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Label {
-    pub name: String,
+struct Label {
+    name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct PullRequest {
-    pub number: i32,
-    pub title: String,
-    pub url: String,
-    pub user: GithubUser,
+struct PullRequest {
+    number: i32,
+    title: String,
+    url: String,
+    user: GithubUser,
 }
 
-pub fn default_pull_request() -> PullRequest {
+fn default_pull_request() -> PullRequest {
     PullRequest {
         number: 0,
         title: "".to_string(),
@@ -29,7 +29,7 @@ pub fn default_pull_request() -> PullRequest {
     }
 }
 
-pub fn default_label() -> Label {
+fn default_label() -> Label {
     Label {
         name: "".to_string(),
     }
@@ -38,11 +38,11 @@ pub fn default_label() -> Label {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PullRequestEvent {
     #[serde(default)]
-    pub action: String,
+    action: String,
     #[serde(default = "default_pull_request")]
-    pub pull_request: PullRequest,
+    pull_request: PullRequest,
     #[serde(default = "default_label")]
-    pub label: Label,
+    label: Label,
 }
 
 impl PullRequestEvent {

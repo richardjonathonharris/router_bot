@@ -15,11 +15,10 @@ async fn receive_webhook(input: Json<github::PullRequestEvent>) -> Status {
     info!("Github webhook received: {:?}", input);
     if input.valid_label_application() {
         let key = "SLACK_CHANNEL";
-        let team = "team";
         let channel = env::var(key).expect("Could not find envvar for SLACK_CHANNEL");
         let message = input.generate_message();
 
-        let config = slack::Config::new(&channel, team);
+        let config = slack::Config::new(&channel);
         let payload = slack::Payload::new(&config, &message);
         let _result = payload.post().await;
     } else {
