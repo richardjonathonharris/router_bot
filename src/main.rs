@@ -1,6 +1,6 @@
 #[macro_use] extern crate rocket;
 
-use log::{error, info};
+use log::{error, info, warn};
 use rocket::{Build, Rocket};
 use rocket::http::Status;
 use rocket::serde::json::{Json};
@@ -12,15 +12,19 @@ mod slack;
 
 #[post("/github_webhooks", format="application/json", data = "<input>")]
 async fn receive_webhook(input: Json<github::github::PullRequestEvent>) -> Status {
-    info!("Received input from the outside world! Info is {:?}", input);
-    let key = "SLACK_CHANNEL";
-    let team = "team";
-    let channel = env::var(key).expect("Could not find envvar for SLACK_CHANNEL");
-    let message = input.generate_message();
+    info!("Github webhook received: {:?}", input);
+    if input.valid_label_application() {
+        let key = "SLACK_CHANNEL";
+        let team = "team";
+        let channel = env::var(key).expect("Could not find envvar for SLACK_CHANNEL");
+        let message = input.generate_message();
 
-    let config = slack::slack::Config::new(&channel, team);
-    let payload = slack::slack::Payload::new(&config, &message);
-    let _result = payload.post().await;
+        let config = slack::slack::Config::new(&channel, team);
+        let payload = slack::slack::Payload::new(&config, &message);
+        let _result = payload.post().await;
+    } else {
+        warn!("Github webhook was not a label application; skipping!");
+    }
     Status::Accepted
 }
 

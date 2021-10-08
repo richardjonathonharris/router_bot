@@ -50,7 +50,7 @@ impl<'a> Payload<'a> {
         let result = client
             .post(ENDPOINT)
             .header(reqwest::header::AUTHORIZATION, bearer_token)
-            .header(reqwest::header::CONTENT_TYPE, "application/json")
+            .header(reqwest::header::CONTENT_TYPE, "application/json; charset=utf-8")
             .body(request)
             .send()
             .await?;
