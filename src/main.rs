@@ -11,7 +11,7 @@ mod github;
 mod slack;
 
 #[post("/github_webhooks", format="application/json", data = "<input>")]
-async fn receive_webhook(input: Json<github::github::PullRequestEvent>) -> Status {
+async fn receive_webhook(input: Json<github::PullRequestEvent>) -> Status {
     info!("Github webhook received: {:?}", input);
     if input.valid_label_application() {
         let key = "SLACK_CHANNEL";
