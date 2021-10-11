@@ -20,13 +20,31 @@ impl Config {
 pub struct Payload {
     channel: String,
     text: String,
+    blocks: Vec<Block>,
+}
+
+#[derive(Serialize)]
+struct TextType {
+    #[serde(rename(serialize = "type"))]
+    text_type: String,
+    text: String,
+}
+
+#[derive(Serialize)]
+struct Block {
+    #[serde(rename(serialize = "type"))]
+    block_type: String,
+    text: TextType
 }
 
 impl Payload {
-    pub fn new(config: Config, text: String) -> Payload {
+    pub fn new(config: Config, text: String, markdown_text: String) -> Payload {
+        let text_block = TextType{ text_type: "mrkdwn".to_string(), text: markdown_text };
+        let block = Block { block_type: "section".to_string(), text: text_block };
         Payload {
             channel: config.channel,
             text,
+            blocks: vec![block],
         }
     }
 
@@ -76,15 +94,18 @@ mod tests {
     #[test]
     fn can_create_slack_payload() {
         let config = Config::new(String::from(CHANNEL));
-        let payload = Payload::new(config, String::from(MESSAGE));
+        let payload = Payload::new(config, String::from(MESSAGE), String::from(MESSAGE));
         assert_eq!(payload.channel, CHANNEL);
         assert_eq!(payload.text, MESSAGE);
+        assert_eq!(payload.blocks[0].block_type, "section");
+        assert_eq!(payload.blocks[0].text.text_type, "mrkdwn");
+        assert_eq!(payload.blocks[0].text.text, MESSAGE);
     }
 
     #[test]
     fn can_serialize_slack_payload_to_json() {
         let config = Config::new(String::from(CHANNEL));
-        let payload = Payload::new(config, String::from(MESSAGE));
-        assert_eq!(String::from("{\"channel\":\"test-channel\",\"text\":\"test-message\"}"), payload.to_json())
+        let payload = Payload::new(config, String::from(MESSAGE), String::from(MESSAGE));
+        assert_eq!(String::from("{\"channel\":\"test-channel\",\"text\":\"test-message\",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"test-message\"}}]}"), payload.to_json())
     }
 }

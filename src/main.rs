@@ -25,10 +25,11 @@ async fn receive_webhook(input: Json<github::PullRequestEvent>) -> Status {
             warn!("No team follows assigned label; skipping!: label id {}, label name {}", input.label.id, input.label.name);
         } else {
             for team in matching_teams {
-                let message = input.generate_message(team.name);
+                let message = input.generate_message(team.name.clone());
+                let markdown_message = input.generate_markdown_message(team.name);
 
                 let config = slack::Config::new(team.channel_id);
-                let payload = slack::Payload::new(config, message);
+                let payload = slack::Payload::new(config, message, markdown_message);
                 let _result = payload.post().await;
             }
         }
