@@ -24,14 +24,14 @@ pub struct Payload {
 }
 
 #[derive(Serialize)]
-struct TextType {
+pub struct TextType {
     #[serde(rename(serialize = "type"))]
     text_type: String,
     text: String,
 }
 
 #[derive(Serialize)]
-struct Block {
+pub struct Block {
     #[serde(rename(serialize = "type"))]
     block_type: String,
     text: TextType
@@ -61,7 +61,7 @@ impl Payload {
         let request = String::from(&self.to_json());
         let client = reqwest::ClientBuilder::new().build()?;
 
-        info!(target: "slack", "Sending body to {}: {}", ENDPOINT, request);
+        info!("Sending message body to {}: {}", ENDPOINT, request);
 
         let result = client
             .post(ENDPOINT)

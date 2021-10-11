@@ -1,5 +1,7 @@
 use rocket::serde::{Deserialize, Serialize};
 
+const PRS_ENDPOINT: &str  = "https://api.github.com/repos/richardjonathonharris/router_bot/pulls";
+
 #[derive(Serialize, Deserialize, Debug)]
 struct GithubUser {
     login: String,
@@ -12,11 +14,19 @@ pub struct Label {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct PullRequest {
+pub struct PullRequest {
     number: i32,
     title: String,
     html_url: String,
     user: GithubUser,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PullRequestRequest {
+    pub number: i32,
+    title: String,
+    pub html_url: String,
+    pub labels: Vec<Label>,
 }
 
 fn default_pull_request() -> PullRequest {
@@ -60,6 +70,22 @@ impl PullRequestEvent {
         &self.action == "labeled"
     }
 }
+
+pub async fn request_prs() -> Result<Vec<PullRequestRequest>, reqwest::Error>{
+    let client = reqwest::ClientBuilder::new().build()?;
+    info!("Sending request for open PRs to {}", PRS_ENDPOINT);
+
+    let response = client
+        .get(PRS_ENDPOINT)
+        .header("Accept", "application/vnd.github.v3+json")
+        .header("User-Agent", "rooter-bot")
+        .send()
+        .await?;
+    let body = response.text().await?;
+    let deserialized_prs = serde_json::from_str(&body).expect("Could not deserialize json");
+    Ok(deserialized_prs)
+}
+
 
 #[cfg(test)]
 mod tests {
