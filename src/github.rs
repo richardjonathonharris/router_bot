@@ -6,8 +6,9 @@ struct GithubUser {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Label {
-    name: String,
+pub struct Label {
+    pub id: i64,
+    pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -31,6 +32,7 @@ fn default_pull_request() -> PullRequest {
 
 fn default_label() -> Label {
     Label {
+        id: 0,
         name: "".to_string(),
     }
 }
@@ -42,7 +44,7 @@ pub struct PullRequestEvent {
     #[serde(default = "default_pull_request")]
     pull_request: PullRequest,
     #[serde(default = "default_label")]
-    label: Label,
+    pub label: Label,
 }
 
 impl PullRequestEvent {
