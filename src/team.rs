@@ -1,6 +1,6 @@
 pub struct Team {
   label_id: i64,
-  name: String,
+  pub name: String,
 }
 
 impl Team {

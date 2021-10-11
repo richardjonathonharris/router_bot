@@ -48,8 +48,8 @@ pub struct PullRequestEvent {
 }
 
 impl PullRequestEvent {
-    pub fn generate_message(&self) -> String {
-        format!("Pull Request #{} at {} is ready for review!", &self.pull_request.number, &self.pull_request.url)
+    pub fn generate_message(&self, team_name: String) -> String {
+        format!("Attention {}! Pull Request #{} at {} is ready for review!", team_name, &self.pull_request.number, &self.pull_request.url)
     }
 
     pub fn valid_label_application(&self) -> bool {
@@ -98,6 +98,6 @@ mod tests {
             label: default_label(),
         };
 
-        assert_eq!(pull_request_action.generate_message(), "Pull Request #12345 at http://test.pr/ is ready for review!");
+        assert_eq!(pull_request_action.generate_message("Test Team".to_string()), "Attention Test Team! Pull Request #12345 at http://test.pr/ is ready for review!");
     }
 }
