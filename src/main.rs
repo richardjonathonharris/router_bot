@@ -14,8 +14,8 @@ mod team;
 #[post("/github_webhooks", format="application/json", data = "<input>")]
 async fn receive_webhook(input: Json<github::PullRequestEvent>) -> Status {
     let teams = vec![
-        team::Team::new(3428042833, "Newcomer Team".to_string()),
-        team::Team::new(3428042827, "Bug Team".to_string()),
+        team::Team::new(3428042833, "Newcomer Team".to_string(), env::var("NEWCOMER_TEAM_CHANNEL").expect("Could not find envvar for NEWCOMER_TEAM_CHANNEL")),
+        team::Team::new(3428042827, "Bug Team".to_string(), env::var("BUG_TEAM_CHANNEL").expect("Could not find envvar for BUG_TEAM_CHANNEL")),
     ];
 
     info!("Github webhook received: {:?}", input);
@@ -25,11 +25,9 @@ async fn receive_webhook(input: Json<github::PullRequestEvent>) -> Status {
             warn!("No team follows assigned label; skipping!: label id {}, label name {}", input.label.id, input.label.name);
         } else {
             for team in matching_teams {
-                let key = "SLACK_CHANNEL";
-                let channel = env::var(key).expect("Could not find envvar for SLACK_CHANNEL");
                 let message = input.generate_message(team.name);
 
-                let config = slack::Config::new(channel);
+                let config = slack::Config::new(team.channel_id);
                 let payload = slack::Payload::new(config, message);
                 let _result = payload.post().await;
             }

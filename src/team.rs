@@ -1,13 +1,15 @@
 pub struct Team {
   label_id: i64,
   pub name: String,
+  pub channel_id: String,
 }
 
 impl Team {
-  pub fn new(label_id: i64, name: String) -> Team {
+  pub fn new(label_id: i64, name: String, channel_id: String) -> Team {
     Team {
       label_id,
       name,
+      channel_id,
     }
   }
 }
@@ -25,10 +27,11 @@ mod tests {
 
   const LABEL_ID: &i64 = &123456;
   const NAME: &str = "team-name";
+  const CHANNEL_ID: &str = "CH123456";
 
   #[test]
   fn can_create_team() {
-    let team = Team::new(*LABEL_ID, String::from(NAME));
+    let team = Team::new(*LABEL_ID, String::from(NAME), String::from(CHANNEL_ID));
     assert_eq!(team.label_id, *LABEL_ID);
     assert_eq!(team.name, NAME);
   }
@@ -36,8 +39,8 @@ mod tests {
   #[test]
   fn can_filter_vector_of_teams() {
     let teams = vec![
-      Team::new(123456, "Test Team".to_string()),
-      Team::new(654321, "Test Team 2".to_string()),
+      Team::new(123456, "Test Team".to_string(), String::from(CHANNEL_ID)),
+      Team::new(654321, "Test Team 2".to_string(), String::from(CHANNEL_ID)),
     ];
 
     let filtered_team = filter_teams(teams, 654321);
